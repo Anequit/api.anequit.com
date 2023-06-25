@@ -18,13 +18,6 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: connect and pull
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
-    - name: Build and restart service
-      run: | 
-        cd ${{ secrets.WORK_DIR }}
-        dotnet publish -o /bin
-        systemctl restart api.service
-    - name: Exit
-      run: exit
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && dotnet build -configuration Release && dotnet publish -o /bin && systemctl restart api.service && exit"
     - name: cleanup
       run: rm -rf ~/.ssh
