@@ -19,9 +19,11 @@ jobs:
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: connect and pull
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
-    - name: Build  
+    - name: Build and restart service
       run: | 
-        dotnet build --configuration Release
+        cd ${{ secrets.WORK_DIR }}
+        dotnet publish -o /bin
+        systemctl restart api.service
     - name: Exit
       run: exit
     - name: cleanup
