@@ -24,7 +24,7 @@ internal class Program
 
         app.MapControllers();
 
-        app.MapGet("/", () => Results.Redirect("www.anequit.com", true));
+        app.MapGet("/", () => Results.Redirect("https://www.anequit.com", true));
 
         app.Run();
     }
