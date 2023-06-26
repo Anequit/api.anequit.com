@@ -24,10 +24,7 @@ internal class Program
 
         app.MapControllers();
 
-        app.MapGet("/", () =>
-        {
-            return "Testing api deployment";
-        });
+        app.MapGet("/", () => Results.Redirect("www.anequit.com", true));
 
         app.Run();
     }
