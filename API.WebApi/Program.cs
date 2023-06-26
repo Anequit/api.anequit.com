@@ -20,4 +20,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/", () =>
+{
+    return "Testing api deployment";
+});
+
 app.Run();
