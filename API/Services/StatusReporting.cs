@@ -22,11 +22,11 @@ public class StatusReporting : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        while(!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
 
-            using(HttpClient client = _httpClientFactory.CreateClient())
+            using (HttpClient client = _httpClientFactory.CreateClient())
             {
                 HttpResponseMessage response = await client.PostAsJsonAsync(_configuration["ReportingWebhook"], new Dictionary<string, string>()
                 {
