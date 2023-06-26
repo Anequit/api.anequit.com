@@ -11,8 +11,8 @@ namespace API.Services;
 
 public class StatusReporting : IHostedService
 {
-    private IHttpClientFactory _httpClientFactory;
-    private IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IConfiguration _configuration;
 
     public StatusReporting(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
