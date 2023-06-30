@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+namespace API;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -14,6 +16,7 @@ internal class Program
         builder.Services.AddHostedService<StatusReporting>();
         builder.Services.AddHttpClient();
         builder.Services.AddControllers();
+        
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
