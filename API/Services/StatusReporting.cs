@@ -25,7 +25,7 @@ public class StatusReporting : IHostedService
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
+            await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
 
             using (HttpClient client = _httpClientFactory.CreateClient())
             {
