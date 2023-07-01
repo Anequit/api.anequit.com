@@ -65,7 +65,7 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("cmd", "-c dir")
+                process.StartInfo = new ProcessStartInfo("bash", "cpu.sh")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
