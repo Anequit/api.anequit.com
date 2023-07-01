@@ -70,8 +70,7 @@ public class StatusReporting : IHostedService
                 process.StartInfo = new ProcessStartInfo("bash", processName)
                 {
                     UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = System.IO.Directory.GetCurrentDirectory()
+                    RedirectStandardOutput = true
                 };
 
                 process.Start();
@@ -93,7 +92,7 @@ public class StatusReporting : IHostedService
         }
         catch (Exception)
         {
-            output = "Failed to fetch memory usage";
+            output = string.Format("Something went wrong while trying to run {0}", processName);
         }
 
         return output;
