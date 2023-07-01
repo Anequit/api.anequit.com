@@ -1,2 +1,2 @@
 #!/bin/bash
-free -m | awk 'NR==2{ printf "Memory Usage: %.2f%%", $3*100/$2 }'
+free -m | awk 'NR==2{ printf "%.2f%%", $3*100/$2 }'
