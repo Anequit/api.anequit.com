@@ -38,7 +38,7 @@ public class StatusReporting : IHostedService
                         new Embed()
                         {
                             Title = "Resource Usage",
-                            Description = string.Format("__CPU__:{0}\n__MEM__{1}",
+                            Description = string.Format("__CPU__: {0}\n__MEM__: {1}",
                                                         await RunProcess("./cpu.sh", cancellationToken),
                                                         await RunProcess("./mem.sh", cancellationToken))
                         }
