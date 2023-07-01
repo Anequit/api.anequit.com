@@ -14,7 +14,7 @@ internal static class Program
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         builder.Logging.AddConsole();
-        
+
         // Add services to the container.
         builder.Services.AddHostedService<StatusReporting>();
         builder.Services.AddHttpClient();
