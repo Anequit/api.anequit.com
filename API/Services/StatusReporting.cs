@@ -65,7 +65,7 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("echo", "\"CPU Usage: \"$[100-$(vmstat 1 2|tail -1|awk '{print $15}')]\"%\"")
+                process.StartInfo = new ProcessStartInfo("bash", @"bash -c 'printf ""CPU Usage: %d%%"" $((100-$(vmstat 1 2|tail -1|awk ""{print \$15}"")))'")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
@@ -94,7 +94,7 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("free -m | awk 'NR==2{ printf \"Memory Usage: %.2f%%\n\", $3*100/$2 }'")
+                process.StartInfo = new ProcessStartInfo("bash", @"-c free -m | awk 'NR==2{ printf ""Memory Usage: %.2f%%\n"", $3*100/$2 }'")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
