@@ -65,7 +65,7 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("bash", "cpu.sh")
+                process.StartInfo = new ProcessStartInfo("bash", "./cpu.sh")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
@@ -99,7 +99,7 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("bash", "mem.sh")
+                process.StartInfo = new ProcessStartInfo("bash", "./mem.sh")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
