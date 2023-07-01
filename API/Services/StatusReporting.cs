@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -28,15 +28,27 @@ public class StatusReporting : IHostedService
 
             using (HttpClient client = _httpClientFactory.CreateClient())
             {
-                HttpResponseMessage response = await client.PostAsJsonAsync(_configuration["ReportingWebhook"], new Dictionary<string, string>()
+                WebhookResponse data = new WebhookResponse()
                 {
+                    Username = "API Report",
+                    Content = null,
+                    Flags = 4096,
+                    Embeds = new[]
                     {
-                        "username", "API Report"
-                    },
-                    {
-                        "content", "Test"
+                        new Embed()
+                        {
+                            Title = "Resource Usage",
+                            Description = string.Format("{0}\n{1}", await CalculateCpuUsage(cancellationToken), await CalculateMemoryUsage(cancellationToken))
+                        }
                     }
-                }, cancellationToken: cancellationToken);
+                };
+
+                Debug.WriteLine(_configuration["ReportingWebhook"]);
+
+                using (HttpResponseMessage response = await client.PostAsJsonAsync(_configuration["ReportingWebhook"], data, cancellationToken))
+                {
+                    response.EnsureSuccessStatusCode();
+                }
             }
         }
     }
@@ -45,4 +57,76 @@ public class StatusReporting : IHostedService
     {
         throw new NotImplementedException();
     }
+
+    private static async Task<string> CalculateCpuUsage(CancellationToken cancellationToken)
+    {
+        string output;
+
+        try
+        {
+            using (Process process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo("echo", "\"CPU Usage: \"$[100-$(vmstat 1 2|tail -1|awk '{print $15}')]\"%\"")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
+                };
+
+                process.Start();
+
+                output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+
+                await process.WaitForExitAsync(cancellationToken);
+            }
+        }
+        catch (Exception)
+        {
+            output = "Failed to fetch cpu usage";
+        }
+
+        return output;
+    }
+
+    private static async Task<string> CalculateMemoryUsage(CancellationToken cancellationToken)
+    {
+        string output;
+
+        try
+        {
+            using (Process process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo("free -m | awk 'NR==2{ printf \"Memory Usage: %.2f%%\n\", $3*100/$2 }'")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
+                };
+
+                process.Start();
+
+                output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+
+                await process.WaitForExitAsync(cancellationToken);
+            }
+        }
+        catch (Exception)
+        {
+            output = "Failed to fetch memory usage";
+        }
+
+        return output;
+    }
+}
+
+file class WebhookResponse
+{
+    public string? Username { get; init; }
+    public string? Content { get; init; }
+    public Embed[]? Embeds { get; init; }
+    public int Flags { get; set; }
+}
+
+file class Embed
+{
+    public string? Title { get; set; }
+    public string? Description { get; set; }
 }
