@@ -13,9 +13,9 @@ namespace API.Services;
 public class StatusReporting : IHostedService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger _logger;
+    private readonly ILogger<StatusReporting> _logger;
 
-    public StatusReporting(IHttpClientFactory httpClientFactory, ILogger logger)
+    public StatusReporting(IHttpClientFactory httpClientFactory, ILogger<StatusReporting> logger)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
