@@ -39,7 +39,9 @@ public class StatusReporting : IHostedService
                         new Embed()
                         {
                             Title = "Resource Usage",
-                            Description = string.Format("{0}\n{1}", await CalculateCpuUsage(cancellationToken), await CalculateMemoryUsage(cancellationToken))
+                            Description = string.Format("{0}\n{1}", 
+                                                        await RunProcess("./cpu.sh", cancellationToken),
+                                                        await RunProcess("./mem.sh", cancellationToken))
                         }
                     }
                 };
@@ -56,8 +58,8 @@ public class StatusReporting : IHostedService
     {
         throw new NotImplementedException();
     }
-
-    private async Task<string> CalculateCpuUsage(CancellationToken cancellationToken)
+    
+    private async Task<string> RunProcess(string processName, CancellationToken cancellationToken)
     {
         string output = string.Empty;
 
@@ -65,44 +67,11 @@ public class StatusReporting : IHostedService
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("bash", "./cpu.sh")
+                process.StartInfo = new ProcessStartInfo("bash", processName)
                 {
                     UseShellExecute = false,
-                    RedirectStandardOutput = true
-                };
-
-                process.Start();
-
-                while (!process.StandardOutput.EndOfStream)
-                {
-                    output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-                }
-
-                _logger.LogInformation(output);
-                
-                await process.WaitForExitAsync(cancellationToken);
-            }
-        }
-        catch (Exception)
-        {
-            output = "Failed to fetch cpu usage";
-        }
-
-        return output;
-    }
-
-    private async Task<string> CalculateMemoryUsage(CancellationToken cancellationToken)
-    {
-        string output = string.Empty;
-
-        try
-        {
-            using (Process process = new Process())
-            {
-                process.StartInfo = new ProcessStartInfo("bash", "./mem.sh")
-                {
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = System.IO.Directory.GetCurrentDirectory()
                 };
 
                 process.Start();
@@ -113,6 +82,11 @@ public class StatusReporting : IHostedService
                 }
                     
                 _logger.LogInformation(output);
+
+                if (string.IsNullOrEmpty(output))
+                {
+                    throw new Exception();
+                }
                 
                 await process.WaitForExitAsync(cancellationToken);
             }
@@ -123,7 +97,7 @@ public class StatusReporting : IHostedService
         }
 
         return output;
-    }
+    } 
 }
 
 file class WebhookResponse
