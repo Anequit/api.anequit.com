@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Diagnostics;
 using System.Net.Http;
@@ -39,7 +38,7 @@ public class StatusReporting : IHostedService
                         new Embed()
                         {
                             Title = "Resource Usage",
-                            Description = string.Format("{0}\n{1}", 
+                            Description = string.Format("__CPU__:{0}\n__MEM__{1}",
                                                         await RunProcess("./cpu.sh", cancellationToken),
                                                         await RunProcess("./mem.sh", cancellationToken))
                         }
@@ -58,10 +57,10 @@ public class StatusReporting : IHostedService
     {
         throw new NotImplementedException();
     }
-    
-    private async Task<string> RunProcess(string processName, CancellationToken cancellationToken)
+
+    private static async Task<string> RunProcess(string processName, CancellationToken cancellationToken)
     {
-        string output = string.Empty;
+        string output;
 
         try
         {
@@ -75,28 +74,23 @@ public class StatusReporting : IHostedService
 
                 process.Start();
 
-                while (!process.StandardOutput.EndOfStream)
-                {
-                    output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-                }
-                    
-                _logger.LogInformation(output);
+                output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
 
                 if (string.IsNullOrEmpty(output))
                 {
-                    throw new Exception();
+                    throw new Exception("Failed to fetch usage");
                 }
-                
+
                 await process.WaitForExitAsync(cancellationToken);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            output = string.Format("Something went wrong while trying to run {0}", processName);
+            output = ex.Message;
         }
 
         return output;
-    } 
+    }
 }
 
 file class WebhookResponse
