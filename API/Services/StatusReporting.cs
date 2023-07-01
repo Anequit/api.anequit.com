@@ -13,12 +13,12 @@ namespace API.Services;
 public class StatusReporting : IHostedService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IConfiguration _configuration;
+    private readonly ILogger _logger;
 
-    public StatusReporting(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public StatusReporting(IHttpClientFactory httpClientFactory, ILogger logger)
     {
         _httpClientFactory = httpClientFactory;
-        _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -57,15 +57,15 @@ public class StatusReporting : IHostedService
         throw new NotImplementedException();
     }
 
-    private static async Task<string> CalculateCpuUsage(CancellationToken cancellationToken)
+    private async Task<string> CalculateCpuUsage(CancellationToken cancellationToken)
     {
-        string output;
+        string output = string.Empty;
 
         try
         {
             using (Process process = new Process())
             {
-                process.StartInfo = new ProcessStartInfo("bash", "cpu.sh")
+                process.StartInfo = new ProcessStartInfo("cmd", "-c dir")
                 {
                     UseShellExecute = false,
                     RedirectStandardOutput = true
@@ -73,8 +73,13 @@ public class StatusReporting : IHostedService
 
                 process.Start();
 
-                output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+                }
 
+                _logger.LogInformation(output);
+                
                 await process.WaitForExitAsync(cancellationToken);
             }
         }
@@ -86,9 +91,9 @@ public class StatusReporting : IHostedService
         return output;
     }
 
-    private static async Task<string> CalculateMemoryUsage(CancellationToken cancellationToken)
+    private async Task<string> CalculateMemoryUsage(CancellationToken cancellationToken)
     {
-        string output;
+        string output = string.Empty;
 
         try
         {
@@ -102,8 +107,13 @@ public class StatusReporting : IHostedService
 
                 process.Start();
 
-                output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+                }
+                    
+                _logger.LogInformation(output);
+                
                 await process.WaitForExitAsync(cancellationToken);
             }
         }
