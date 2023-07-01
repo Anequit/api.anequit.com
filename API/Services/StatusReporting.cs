@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace API.Services;
 
@@ -43,9 +44,7 @@ public class StatusReporting : IHostedService
                     }
                 };
 
-                Debug.WriteLine(_configuration["ReportingWebhook"]);
-
-                using (HttpResponseMessage response = await client.PostAsJsonAsync(_configuration["ReportingWebhook"], data, cancellationToken))
+                using (HttpResponseMessage response = await client.PostAsJsonAsync(Environment.GetEnvironmentVariable("WEBHOOK_URL"), data, cancellationToken))
                 {
                     response.EnsureSuccessStatusCode();
                 }
