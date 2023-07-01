@@ -1,3 +1,5 @@
+name: deploy-api
+
 on:
   release:
     types: [published]
