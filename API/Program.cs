@@ -13,11 +13,11 @@ internal static class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        builder.Logging.AddConsole();
+        //builder.Logging.AddConsole();
 
         // Add services to the container.
-        builder.Services.AddHostedService<StatusReporting>();
         builder.Services.AddHttpClient();
+        //builder.Services.AddHostedService<StatusReporting>();
         builder.Services.AddControllers();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
