@@ -1,3 +1,4 @@
+using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,8 @@ internal static class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
+        builder.Services.AddHttpClient();
+        builder.Services.AddHostedService<ResourceUsageReporting>();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
