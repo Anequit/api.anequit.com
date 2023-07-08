@@ -36,7 +36,7 @@ public class ResourceUsageReporting : BackgroundService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
+            await Task.Delay(TimeSpan.FromMinutes(10), cancellationToken);
 
             (string cpuUsage, string memUsage) = await GetResourceUsage(cancellationToken);
 
