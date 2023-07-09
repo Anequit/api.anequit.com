@@ -59,15 +59,14 @@ public class ResourceUsageReporting : BackgroundService
         {
             _message ??= new WebhookMessage()
             {
-                Content = null,
-                Flags = 4096,
                 Embeds = new[]
                 {
                     new Embed()
                     {
                         Title = "Resource Usage"
                     }
-                }
+                },
+                Flags = 4096
             };
 
             _message.Embeds[0].Title = title;
@@ -104,9 +103,7 @@ public class ResourceUsageReporting : BackgroundService
 
 public class WebhookMessage
 {
-    public string? Content { get; init; }
     public Embed[] Embeds { get; init; } = null!;
-
     public int Flags { get; set; }
 }
 
