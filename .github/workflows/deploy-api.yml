@@ -1,24 +1,34 @@
-name: deploy-api
+name: Deploy API
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
-  workflow_dispatch:
-  
-jobs:
-  run_pull:
-    name: run pull
-    runs-on: ubuntu-latest
     
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
     steps:
-    - name: install ssh keys
-      # check this thread to understand why its needed:
-      # https://stackoverflow.com/a/70447517
-      run: |
-        install -m 600 -D /dev/null ~/.ssh/id_rsa
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-    - name: connect and pull
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && dotnet build ./src/API -c Release -o bin && cp scripts/*.* bin && systemctl restart api.service && exit"
-    - name: cleanup
-      run: rm -rf ~/.ssh
+      - uses: actions/checkout@v3
+      - name: Install .NET Core 
+        uses: actions/setup-dotnet@v3.2.0
+        with:
+            dotnet-version: '7.x'
+            cache: true
+      - name: Restore Dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build src/API -c Release -o bin
+      - name: Copy Scripts
+        run: cp scripts/* bin/
+      - name: Install SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: Deploy API
+        run: rsync -rlgoDzvc bin/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.OUTPUT_DIR }}
+      - name: Restart Service
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "systemctl restart api.service && exit" 
+      - name: Cleanup SSH
+        run: rm -rf ~/.ssh
